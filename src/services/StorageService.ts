@@ -7,8 +7,9 @@ export class StorageService {
   static async getAllData(): Promise<FieldData[]> {
     try {
       const response = await fetch(this.API_URL);
-      if (!response.ok) throw new Error('Network error');
+      if (!response.ok) throw new Error(`Network error: ${response.status}`);
       const data = await response.json();
+      if (!Array.isArray(data)) throw new Error('Invalid data format from server');
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
       return data;
     } catch (error) {
@@ -19,19 +20,21 @@ export class StorageService {
   }
 
   static async saveData(fieldData: FieldData): Promise<void> {
-    const existingData = await this.getAllData();
-    existingData.push(fieldData);
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existingData));
-
     try {
       const response = await fetch(this.API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(fieldData),
       });
-      if (!response.ok) throw new Error('Network error');
+      if (!response.ok) throw new Error(`Network error: ${response.status}`);
+      const existingData = await this.getAllData();
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existingData));
     } catch (error) {
-      console.error('API save failed, data stored locally:', error);
+      console.error('API save failed, storing locally:', error);
+      const existingData = await this.getAllData();
+      existingData.push(fieldData);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existingData));
+      throw error; // Rethrow to notify caller (e.g., useFieldData)
     }
   }
 
@@ -39,7 +42,7 @@ export class StorageService {
     localStorage.removeItem(this.STORAGE_KEY);
     try {
       const response = await fetch(this.API_URL, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Network error');
+      if (!response.ok) throw new Error(`Network error: ${response.status}`);
     } catch (error) {
       console.error('API clear failed:', error);
     }
@@ -52,7 +55,7 @@ export class StorageService {
     try {
       const localEntries: FieldData[] = JSON.parse(localData);
       const response = await fetch(this.API_URL);
-      if (!response.ok) throw new Error('Network error');
+      if (!response.ok) throw new Error(`Network error: ${response.status}`);
       const serverData: FieldData[] = await response.json();
 
       const newEntries = localEntries.filter(
@@ -60,11 +63,12 @@ export class StorageService {
       );
 
       for (const entry of newEntries) {
-        await fetch(this.API_URL, {
+        const postResponse = await fetch(this.API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(entry),
         });
+        if (!postResponse.ok) throw new Error(`Network error: ${postResponse.status}`);
       }
 
       const updatedData = await this.getAllData();

@@ -3,33 +3,33 @@ export class FieldData {
     title: string;
     description: string;
     timestamp: string;
-     height: number;
-  weight: number;
-  bloodPressureSystolic: number;
-  bloodPressureDiastolic: number;
-  age: number;
-  gender: string;
-  location: string;
-  smokingStatus?: string;
-  stressScore?: number;
-  consent: boolean;
-  participantId: string;
+    height: number;
+    weight: number;
+    bloodPressureSystolic: number;
+    bloodPressureDiastolic: number;
+    age: number;
+    gender: string;
+    location: string;
+    smokingStatus?: string;
+    stressScore?: number;
+    consent: boolean;
+    participantId: string;
 
     constructor(
         title: string,
-    description: string,
-    height: number,
-    weight: number,
-    bloodPressureSystolic: number,
-    bloodPressureDiastolic: number,
-    age: number,
-    gender: string,
-    location: string,
-    consent: boolean,
-    participantId: string,
-    smokingStatus?: string,
-    stressScore?: number,
-    timestamp?: string
+        description: string,
+        height: number,
+        weight: number,
+        bloodPressureSystolic: number,
+        bloodPressureDiastolic: number,
+        age: number,
+        gender: string,
+        location: string,
+        consent: boolean,
+        participantId: string,
+        smokingStatus?: string,
+        stressScore?: number,
+        timestamp?: string
     ) {
         this.id = Date.now(); //unique id based on timestamp
         this.title = title;
