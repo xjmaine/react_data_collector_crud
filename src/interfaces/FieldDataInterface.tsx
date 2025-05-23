@@ -2,7 +2,14 @@ import { useState, useEffect } from 'react';
 import { FieldData } from '../models/FieldData';
 import { StorageService } from '../services/StorageService';
 
-export function useFieldData() {
+interface FieldDataHook {
+  dataList: FieldData[];
+  addData: (fieldData: FieldData) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+}
+
+export function useFieldData(): FieldDataHook {
   const [dataList, setDataList] = useState<FieldData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
