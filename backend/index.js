@@ -37,6 +37,9 @@ app.get('/api/v1/field-data', (req, res) => {
 // POST /api/v1/field-data
 app.post('/api/v1/field-data', (req, res) => {
   const fieldData = req.body;
+  // Convert ISO 8601 timestamp to MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)
+  const timestamp = new Date(fieldData.timestamp).toISOString().slice(0, 19).replace('T', ' ');
+
   const query = `
     INSERT INTO field_data (
       id, title, description, timestamp, height, weight,
@@ -48,7 +51,7 @@ app.post('/api/v1/field-data', (req, res) => {
     fieldData.id,
     fieldData.title,
     fieldData.description,
-    fieldData.timestamp,
+    timestamp,
     fieldData.height,
     fieldData.weight,
     fieldData.bloodPressureSystolic,
@@ -67,6 +70,7 @@ app.post('/api/v1/field-data', (req, res) => {
       console.error('Error inserting data:', err);
       return res.status(500).json({ error: 'Database error' });
     }
+    console.log('Data inserted successfully:', fieldData.id);
     res.status(201).json({ message: 'Data saved', id: fieldData.id });
   });
 });

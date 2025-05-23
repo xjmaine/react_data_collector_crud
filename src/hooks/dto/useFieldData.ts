@@ -28,9 +28,13 @@ export function useFieldData(): FieldDataInterface {
       });
 
     const handleOnline = () => {
+      setError(null); // Clear previous errors
       StorageService.syncData()
         .then(() => StorageService.getAllData())
-        .then((data) => setDataList(Array.isArray(data) ? data : []))
+        .then((data) => {
+          setDataList(Array.isArray(data) ? data : []);
+          setError(null);
+        })
         .catch((err: unknown) => {
           const message = err instanceof Error ? err.message : String(err);
           setError('Sync failed: ' + message);
